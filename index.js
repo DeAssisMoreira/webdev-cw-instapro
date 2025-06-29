@@ -1,4 +1,4 @@
-import { getPosts } from "./api.js";
+import { addPost, getPosts } from "./api.js";
 import { renderAddPostPageComponent } from "./components/add-post-page-component.js";
 import { renderAuthPageComponent } from "./components/auth-page-component.js";
 import {
@@ -56,6 +56,7 @@ export const goToPage = (newPage, data) => {
 
       return getPosts({ token: getToken() })
         .then((newPosts) => {
+          console.log("Загруженные посты", newPosts);
           page = POSTS_PAGE;
           posts = newPosts;
           renderApp();
@@ -67,12 +68,26 @@ export const goToPage = (newPage, data) => {
     }
 
     if (newPage === USER_POSTS_PAGE) {
-      // @@TODO: реализовать получение постов юзера из API
-      console.log("Открываю страницу пользователя: ", data.userId);
+  page = LOADING_PAGE;
+  renderApp();
+
+  return fetch(`${postsHost}/user-posts/${data.userId}`, {
+    method: "GET",
+    headers: {
+      Authorization: getToken(),
+    },
+  })
+    .then((response) => response.json())
+    .then((newPosts) => {
       page = USER_POSTS_PAGE;
-      posts = [];
-      return renderApp();
-    }
+      posts = newPosts.posts;
+      renderApp();
+    })
+    .catch((error) => {
+      console.error("Ошибка загрузки постов пользователя:", error);
+      goToPage(POSTS_PAGE);
+    });
+}
 
     page = newPage;
     renderApp();
@@ -110,10 +125,26 @@ const renderApp = () => {
     return renderAddPostPageComponent({
       appEl,
       onAddPostClick({ description, imageUrl }) {
-        // @TODO: реализовать добавление поста в API
-        console.log("Добавляю пост...", { description, imageUrl });
-        goToPage(POSTS_PAGE);
+        page = LOADING_PAGE;
+        renderApp();
+
+        return addPost({
+          token: getToken(),
+          description,
+          imageUrl,
+        }).then(() => {
+          return getPosts({ token: getToken() }).then((newPosts) => {
+            posts = newPosts;
+            goToPage(POSTS_PAGE);
+          })
+          .catch((error) => {
+        console.error("Ошибка добавления поста:", error);
+        goToPage(ADD_POSTS_PAGE);
+        throw Error;
+          })
+        })
       },
+//  console.log("Добавляю пост...", { description, imageUrl })
     });
   }
 
