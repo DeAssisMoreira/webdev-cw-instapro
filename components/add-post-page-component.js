@@ -1,6 +1,7 @@
 import { renderHeaderComponent } from "./header-component.js";
 import { renderUploadImageComponent } from "./upload-image-component.js";
-import { goToPage, POSTS_PAGE, user } from "../index.js";
+import { goToPage, user } from "../index.js";
+import { POSTS_PAGE } from "../routes.js";
 
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
   let imageUrl = "";
