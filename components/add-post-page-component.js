@@ -6,7 +6,7 @@ import { POSTS_PAGE } from "../routes.js";
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
   let imageUrl = "";
   let isLoading = false;
-  
+
   const render = () => {
     const appHtml = `
     <div class="page-container">
@@ -46,7 +46,9 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
     });
 
     document.getElementById("add-button").addEventListener("click", () => {
-      const description = document.getElementById("description-textarea").value.trim();
+      const description = document
+        .getElementById("description-textarea")
+        .value.trim();
       const errorEl = document.querySelector(".form-error");
 
       if (!imageUrl) {
@@ -80,20 +82,19 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
         });
     });
   };
-  
+
   render();
 }
 
-// import { uploadImage, addPost, getPosts } from "../api.js";
 // import { renderHeaderComponent } from "./header-component.js";
 // import { renderUploadImageComponent } from "./upload-image-component.js";
 // import { goToPage, POSTS_PAGE } from "../index.js";
-
+// import { POSTS_PAGE } from "../routes.js";
 
 // export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //   let imageUrl = "";
 //   let isLoading = false;
-  
+
 //   const render = () => {
 //     // @TODO: Реализовать страницу добавления поста
 //     const appHtml = `
@@ -103,7 +104,7 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //       <h3 class="form-title">Добавить пост</h3>
 //       <div class="form-inputs">
 //       <div class="upload-image-container"></div>
-//       <textarea 
+//       <textarea
 //       id="description-textarea"
 //       class="input-textarea"
 //       placeholder="Описание поста..."
@@ -128,7 +129,6 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //         imageUrl = newImageUrl;
 //       },
 //     });
-    
 
 //     document.getElementById("add-button").addEventListener("click", () => {
 //       const descriptionElement = document.getElementById("description-textarea");
@@ -169,8 +169,7 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //   render();
 // }
 
-
-      // onAddPostClick({
-      //   description: "Описание картинки",
-      //   imageUrl: "https://image.png",
-      // });
+// onAddPostClick({
+//   description: "Описание картинки",
+//   imageUrl: "https://image.png",
+// });

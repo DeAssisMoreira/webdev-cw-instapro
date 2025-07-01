@@ -1,4 +1,4 @@
-import { goToPage, logout, user } from "../index.js";
+import { goToPage, logout } from "../index.js";
 import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE } from "../routes.js";
 
 /**

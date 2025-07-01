@@ -72,8 +72,7 @@ export function addPost({ token, description, imageUrl }) {
   return fetch(postsHost, {
     method: "POST",
     headers: {
-      Authorization: token,
-      "Content-Type": "application/json",
+      Authorization: token
     },
     body: JSON.stringify({
       description,

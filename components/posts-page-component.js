@@ -4,7 +4,7 @@ import { posts, goToPage } from "../index.js";
 // import { formatDistanceToNow } from 'date-fns';
 // import { ru } from 'date-fns/locale/ru';
 
-export function renderPostsPageComponent({ appEl }) {
+export function renderPostsPageComponent({ appEl, user }) {
   // @TODO: реализовать рендер постов из api
   console.log("Актуальный список постов:", posts);
 
@@ -67,6 +67,7 @@ export function renderPostsPageComponent({ appEl }) {
 
   renderHeaderComponent({
     element: document.querySelector(".header-container"),
+  user
   });
   document.querySelectorAll(".posts-header").forEach((userEl) => {
     userEl.addEventListener("click", () => {
