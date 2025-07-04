@@ -1,29 +1,29 @@
-import { USER_POSTS_PAGE } from "../routes.js";
-import { renderHeaderComponent } from "./header-component.js";
-import { posts, goToPage } from "../index.js";
+import { USER_POSTS_PAGE } from '../routes.js'
+import { renderHeaderComponent } from './header-component.js'
+import { posts, goToPage } from '../index.js'
 // import { formatDistanceToNow } from 'date-fns';
 // import { ru } from 'date-fns/locale/ru';
 
 export function renderPostsPageComponent({ appEl, user }) {
-  // @TODO: реализовать рендер постов из api
-  console.log("Актуальный список постов:", posts);
+    // @TODO: реализовать рендер постов из api
+    console.log('Актуальный список постов:', posts)
 
-  /**
-   * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
-   * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
-   */
-  // 29 строка (images/like-${post.isLiked ? 'active' : 'not-active'}.svg")
-  const appHtml = `
+    /**
+     * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
+     * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
+     */
+    // 29 строка (images/like-${post.isLiked ? 'active' : 'not-active'}.svg")
+    const appHtml = `
               <div class="page-container">
                 <div class="header-container"></div>
                 <ul class="posts">
                 ${posts
-                  .map(
-                    (post) => `
+                    .map(
+                        (post) => `
                   <li class="post">
                     <div class="post-header" data-user-id="${post.user.id}">
                         <img src="${
-                          post.user.imageUrl
+                            post.user.imageUrl
                         }" class="post-header__user-image">
                         <p class="post-header__user-name">${post.user.name}</p>
                     </div>
@@ -33,9 +33,9 @@ export function renderPostsPageComponent({ appEl, user }) {
                     <div class="post-likes">
                       <button data-post-id="${post.id}" class="like-button">
                       <img src="./assets/images/${
-                        post.isLiked
-                          ? 'like-active.svg'
-                          : 'like-not-active.svg'
+                          post.isLiked
+                              ? 'like-active.svg'
+                              : 'like-not-active.svg'
                       }"> 
                       </button>
                       <p class="post-likes-text">
@@ -50,35 +50,37 @@ export function renderPostsPageComponent({ appEl, user }) {
                     ${formatDate(post.createdAt)}
                     </p>
                   </li>
-                  `
-                  )
-                  .join("")}
+                  `,
+                    )
+                    .join('')}
                 </ul>
-              </div>`;
+              </div>`
 
-              // Временное решение с датой
-                  function formatDate(dateString) {
-                    const date = new Date(dateString);
-                    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], 
-                      {hour: '2-digit', minute : '2-digit'});
-                  }
+    // Временное решение с датой
+    function formatDate(dateString) {
+        const date = new Date(dateString)
+        return (
+            date.toLocaleDateString() +
+            ' ' +
+            date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        )
+    }
 
-  appEl.innerHTML = appHtml;
+    appEl.innerHTML = appHtml
 
-  renderHeaderComponent({
-    element: document.querySelector(".header-container"),
-  user
-  });
-  document.querySelectorAll(".posts-header").forEach((userEl) => {
-    userEl.addEventListener("click", () => {
-      goToPage(USER_POSTS_PAGE, { userId: userEl.dataset.userId });
-    });
-  });
+    renderHeaderComponent({
+        element: document.querySelector('.header-container'),
+        user,
+    })
+    document.querySelectorAll('.posts-header').forEach((userEl) => {
+        userEl.addEventListener('click', () => {
+            goToPage(USER_POSTS_PAGE, { userId: userEl.dataset.userId })
+        })
+    })
 }
-  // for (let userEl of document.querySelectorAll(".post-header")) {
-  //   userEl.addEventListener("click", () => {
-  //     goToPage(USER_POSTS_PAGE, {
-  //       userId: userEl.dataset.userId});
-  //   });
-  // }
-
+// for (let userEl of document.querySelectorAll(".post-header")) {
+//   userEl.addEventListener("click", () => {
+//     goToPage(USER_POSTS_PAGE, {
+//       userId: userEl.dataset.userId});
+//   });
+// }
