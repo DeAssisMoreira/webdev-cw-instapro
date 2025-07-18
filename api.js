@@ -105,4 +105,4 @@ export function addPost({ token, description, imageUrl }) {
 //         console.error("Ошибка загрузки постов пользователя:", error);
 //         goToPage(POSTS_PAGE);
 //       });
-//   }
+//   };

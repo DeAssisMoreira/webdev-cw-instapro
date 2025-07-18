@@ -78,4 +78,4 @@ export function renderPostsPageComponent({ appEl, user }) {
 //     goToPage(USER_POSTS_PAGE, {
 //       userId: userEl.dataset.userId});
 //   });
-// }
+// };

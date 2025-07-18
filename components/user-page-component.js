@@ -79,4 +79,4 @@ export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
             date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
         )
     }
-}
+};

@@ -166,6 +166,6 @@ const renderApp = () => {
             page,
         })
     }
-}
+};
 
 goToPage(POSTS_PAGE, USER_POSTS_PAGE)
