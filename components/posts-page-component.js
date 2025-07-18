@@ -12,7 +12,7 @@ export function renderPostsPageComponent({ appEl, user }) {
      * @TODO: чтобы отформатировать дату создания поста в виде "19 минут назад"
      * можно использовать https://date-fns.org/v2.29.3/docs/formatDistanceToNow
      */
-    // 29 строка (images/like-${post.isLiked ? 'active' : 'not-active'}.svg")
+    // (images/like-${post.isLiked ? 'active' : 'not-active'}.svg")
     const appHtml = `
               <div class="page-container">
                 <div class="header-container"></div>
@@ -71,11 +71,6 @@ export function renderPostsPageComponent({ appEl, user }) {
     renderHeaderComponent({
         element: document.querySelector('.header-container'),
         user,
-    })
-    document.querySelectorAll('.posts-header').forEach((userEl) => {
-        userEl.addEventListener('click', () => {
-            goToPage(USER_POSTS_PAGE, { userId: userEl.dataset.userId })
-        })
     })
 }
 // for (let userEl of document.querySelectorAll(".post-header")) {
