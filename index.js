@@ -1,4 +1,4 @@
-import { addPost, getPosts } from './api.js'
+import { addPost, getPosts, getUserPosts } from './api.js'
 import { renderAddPostPageComponent } from './components/add-post-page-component.js'
 import { renderAuthPageComponent } from './components/auth-page-component.js'
 import {
@@ -72,21 +72,23 @@ export const goToPage = (newPage, data) => {
             page = LOADING_PAGE
             renderApp()
 
-            return fetch(`${postsHost}/user-posts/${data.userId}`, {
-                method: 'GET',
-                headers: {
-                    Authorization: getToken(),
-                },
+            getUserPosts({token: getToken(), userId: data.userId}) 
+            .then((response) => {
+                if (!response || !response.length) {
+                    console.log('no posts');
+                    posts = [];
+                }
+                else {
+                    posts = response
+                }
+                 page = USER_POSTS_PAGE
+                 renderApp()
             })
-                .then((response) => response.json())
-                .then((newPosts) => {
-                    page = USER_POSTS_PAGE
-                    posts = newPosts.posts
-                    renderApp()
-                })
-                .catch((error) => {
+            .catch((error) => {
                     console.error('Ошибка загрузки постов пользователя:', error)
-                    goToPage(POSTS_PAGE)
+                   posts = [];
+                   page = USER_POSTS_PAGE
+                 renderApp()
                 })
         }
 

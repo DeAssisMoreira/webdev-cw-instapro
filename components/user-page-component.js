@@ -62,14 +62,7 @@ export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
         user,
     })
 
-    setTimeout(() => {
-        document.querySelectorAll('.post-header').forEach((userEl) => {
-            userEl.addEventListener('click', () => {
-                console.log('Clicked user:', userEl.dataset.userId)
-                goToPage(USER_POSTS_PAGE, { userId: userEl.dataset.userId })
-            })
-        })
-    }, 10)
+
 
     function formatDate(dateString) {
         const date = new Date(dateString)

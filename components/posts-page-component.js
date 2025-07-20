@@ -1,8 +1,8 @@
 import { USER_POSTS_PAGE } from '../routes.js'
 import { renderHeaderComponent } from './header-component.js'
 import { posts, goToPage } from '../index.js'
-// import { formatDistanceToNow } from 'date-fns';
-// import { ru } from 'date-fns/locale/ru';
+import { formatDistanceToNow } from ' https://cdn.jsdelivr.net/npm/date-fns@3/+esm'
+import * as ruLocale from ' https://cdn.jsdelivr.net/npm/date-fns@3/locale/ru/+esm'
 
 export function renderPostsPageComponent({ appEl, user }) {
     // @TODO: реализовать рендер постов из api
@@ -47,7 +47,10 @@ export function renderPostsPageComponent({ appEl, user }) {
                       ${post.description}
                     </p>
                     <p class="post-date">
-                    ${formatDate(post.createdAt)}
+                    ${formatDistanceToNow(new Date (post.createdAt), {
+                      addSuffix: true,
+                      locale: ruLocale.default
+                    })}
                     </p>
                   </li>
                   `,
@@ -56,15 +59,6 @@ export function renderPostsPageComponent({ appEl, user }) {
                 </ul>
               </div>`
 
-    // Временное решение с датой
-    function formatDate(dateString) {
-        const date = new Date(dateString)
-        return (
-            date.toLocaleDateString() +
-            ' ' +
-            date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        )
-    }
 
     appEl.innerHTML = appHtml
 
@@ -72,10 +66,13 @@ export function renderPostsPageComponent({ appEl, user }) {
         element: document.querySelector('.header-container'),
         user,
     })
+
+    document.querySelectorAll('.post-header').forEach((userEl) => {
+            userEl.addEventListener('click', () => {
+                console.log('Clicked user:', userEl.dataset.userId)
+                goToPage(USER_POSTS_PAGE, { userId: userEl.dataset.userId })
+            })
+        })
 }
-// for (let userEl of document.querySelectorAll(".post-header")) {
-//   userEl.addEventListener("click", () => {
-//     goToPage(USER_POSTS_PAGE, {
-//       userId: userEl.dataset.userId});
-//   });
-// };
+
+
