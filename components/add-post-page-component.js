@@ -1,14 +1,14 @@
-import { renderHeaderComponent } from "./header-component.js";
-import { renderUploadImageComponent } from "./upload-image-component.js";
-import { goToPage, user } from "../index.js";
-import { POSTS_PAGE } from "../routes.js";
+import { renderHeaderComponent } from './header-component.js'
+import { renderUploadImageComponent } from './upload-image-component.js'
+import { goToPage, user } from '../index.js'
+import { POSTS_PAGE } from '../routes.js'
 
 export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
-  let imageUrl = "";
-  let isLoading = false;
-  
-  const render = () => {
-    const appHtml = `
+    let imageUrl = ''
+    let isLoading = false
+
+    const render = () => {
+        const appHtml = `
     <div class="page-container">
       <div class="header-container"></div>
       <div class="form">
@@ -22,78 +22,80 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
             rows="4">
           </textarea>
           <div class="form-error"></div>
-          <button class="button" id="add-button" ${isLoading ? "disabled" : ""}>
-            ${isLoading ? "Публикация..." : "Добавить"}
+          <button class="button" id="add-button" ${isLoading ? 'disabled' : ''}>
+            ${isLoading ? 'Публикация...' : 'Добавить'}
           </button>
         </div>
       </div>
     </div>
-    `;
+    `
 
-    appEl.innerHTML = appHtml;
+        appEl.innerHTML = appHtml
 
-    // Передаём user в header component
-    renderHeaderComponent({
-      element: document.querySelector(".header-container"),
-      user,
-    });
-
-    renderUploadImageComponent({
-      element: document.querySelector(".upload-image-container"),
-      onImageUrlChange(newImageUrl) {
-        imageUrl = newImageUrl;
-      },
-    });
-
-    document.getElementById("add-button").addEventListener("click", () => {
-      const description = document.getElementById("description-textarea").value.trim();
-      const errorEl = document.querySelector(".form-error");
-
-      if (!imageUrl) {
-        errorEl.textContent = "Добавьте фотографию";
-        return;
-      }
-      if (!description) {
-        errorEl.textContent = "Добавьте описание";
-        return;
-      }
-      if (description.length > 200) {
-        errorEl.textContent = "Описание должно быть не более 200 символов";
-        return;
-      }
-
-      errorEl.textContent = "";
-      isLoading = true;
-      render();
-
-      onAddPostClick({ description, imageUrl })
-        .then(() => {
-          goToPage(POSTS_PAGE);
+        // Передаём user в header component
+        renderHeaderComponent({
+            element: document.querySelector('.header-container'),
+            user,
         })
-        .catch((error) => {
-          console.error("Ошибка добавления поста:", error);
-          errorEl.textContent = "Не удалось опубликовать пост";
+
+        renderUploadImageComponent({
+            element: document.querySelector('.upload-image-container'),
+            onImageUrlChange(newImageUrl) {
+                imageUrl = newImageUrl
+            },
         })
-        .finally(() => {
-          isLoading = false;
-          render();
-        });
-    });
-  };
-  
-  render();
+
+        document.getElementById('add-button').addEventListener('click', () => {
+            const description = document
+                .getElementById('description-textarea')
+                .value.trim()
+            const errorEl = document.querySelector('.form-error')
+
+            if (!imageUrl) {
+                errorEl.textContent = 'Добавьте фотографию'
+                return
+            }
+            if (!description) {
+                errorEl.textContent = 'Добавьте описание'
+                return
+            }
+            if (description.length > 200) {
+                errorEl.textContent =
+                    'Описание должно быть не более 200 символов'
+                return
+            }
+
+            errorEl.textContent = ''
+            isLoading = true
+            render()
+
+            onAddPostClick({ description, imageUrl })
+                .then(() => {
+                    goToPage(POSTS_PAGE)
+                })
+                .catch((error) => {
+                    console.error('Ошибка добавления поста:', error)
+                    errorEl.textContent = 'Не удалось опубликовать пост'
+                })
+                .finally(() => {
+                    isLoading = false
+                    render()
+                })
+        })
+    }
+
+    render()
 }
 
-// import { uploadImage, addPost, getPosts } from "../api.js";
 // import { renderHeaderComponent } from "./header-component.js";
 // import { renderUploadImageComponent } from "./upload-image-component.js";
 // import { goToPage, POSTS_PAGE } from "../index.js";
-
+// import { POSTS_PAGE } from "../routes.js";
 
 // export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //   let imageUrl = "";
 //   let isLoading = false;
-  
+
 //   const render = () => {
 //     // @TODO: Реализовать страницу добавления поста
 //     const appHtml = `
@@ -103,7 +105,7 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //       <h3 class="form-title">Добавить пост</h3>
 //       <div class="form-inputs">
 //       <div class="upload-image-container"></div>
-//       <textarea 
+//       <textarea
 //       id="description-textarea"
 //       class="input-textarea"
 //       placeholder="Описание поста..."
@@ -128,7 +130,6 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //         imageUrl = newImageUrl;
 //       },
 //     });
-    
 
 //     document.getElementById("add-button").addEventListener("click", () => {
 //       const descriptionElement = document.getElementById("description-textarea");
@@ -169,8 +170,7 @@ export function renderAddPostPageComponent({ appEl, onAddPostClick }) {
 //   render();
 // }
 
-
-      // onAddPostClick({
-      //   description: "Описание картинки",
-      //   imageUrl: "https://image.png",
-      // });
+// onAddPostClick({
+//   description: "Описание картинки",
+//   imageUrl: "https://image.png",
+// });
