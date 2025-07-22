@@ -88,41 +88,35 @@ export function addPost({ token, description, imageUrl }) {
     })
 }
 
-export function getUserPosts({token, userId}) {
-    console.log(userId);
-     return fetch(`${postsHost}/user-posts/${userId}`, {
-      method: "GET",
-      headers: {
-        Authorization: token,
-      },
+export function getUserPosts({ token, userId }) {
+    console.log(userId)
+    return fetch(`${postsHost}/user-posts/${userId}`, {
+        method: 'GET',
+        headers: {
+            Authorization: token,
+        },
     })
-    .then((response) => {
-        if (response.status === 404) {
-            throw new Error('user not found')
+        .then((response) => {
+            if (response.status === 404) {
+                throw new Error('user not found')
+            }
+            return response.json()
+        })
+        .then((data) => {
+            return data.posts || []
+        })
+}
+
+export function likePost({ token, postId }) {
+    return fetch(`${postsHost}/${postId}/like`, {
+        method: 'POST',
+        headers: {
+            Authorization: token,
+        },
+    }).then((response) => {
+        if (response.status === 401) {
+            throw new Error('Нет авторизации')
         }
         return response.json()
     })
-      .then((data) => {
-        console.log(data);
-        return data.posts || [];
-      })
 }
-
-// export function renderUserPostsPageComponent({ token, appEl, user, posts, page }) {
-//   return fetch(`${postsHost}/user-posts/${data.userId}`, {
-//       method: "GET",
-//       headers: {
-//         Authorization: getToken(),
-//       },
-//     })
-//       .then((response) => response.json())
-//       .then((newPosts) => {
-//         page = USER_POSTS_PAGE;
-//         posts = newPosts.posts;
-//         renderApp();
-//       })
-//       .catch((error) => {
-//         console.error("Ошибка загрузки постов пользователя:", error);
-//         goToPage(POSTS_PAGE);
-//       });
-//   };
