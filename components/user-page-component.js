@@ -3,7 +3,7 @@ import { renderHeaderComponent } from './header-component.js'
 import { goToPage } from '../index.js'
 import { formatDistanceToNow } from ' https://cdn.jsdelivr.net/npm/date-fns@3/+esm'
 import * as ruLocale from ' https://cdn.jsdelivr.net/npm/date-fns@3/locale/ru/+esm'
-import { likePost, getUserPosts } from '../api.js'
+import { likePost, dislikePost, getUserPosts } from '../api.js'
 
 export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
     const isUserPostsPage = page === USER_POSTS_PAGE
@@ -12,8 +12,15 @@ export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
 
     posts = posts.map((post) => ({
         ...post,
-        likes: [],
-        isLiked: false,
+        likes: post.likes || [],
+        isLiked: user
+            ? (post.likes || []).some(
+                  (like) =>
+                      like?.userId === user.id ||
+                      like?.id === user.id ||
+                      like?.user?.id === user.id,
+              )
+            : false,
     }))
 
     const appHtml = `
@@ -43,10 +50,10 @@ export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
                         </div>
                         <div class="post-likes">
                             <button data-post-id="${post.id}" class="like-button">
-                                <img src="./assets/images/like-not-active.svg"> 
+                                <img src="./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}"> 
                             </button>
                             <p class="post-likes-text">
-                                Нравится: <strong>0</strong>
+                                Нравится: <strong>${post.likes.length}</strong>
                             </p>
                         </div>
                         <p class="post-text">
@@ -98,20 +105,14 @@ function setupLikeHandlers({ posts, token, userId }) {
             if (!post) return
 
             try {
-                post.isLiked = !post.isLiked
                 const likeImg = likeButton.querySelector('img')
                 const likesText = likeButton.nextElementSibling
 
-                if (post.isLiked) {
-                    post.likes.push({ userId })
-                    likeImg.src = './assets/images/like-active.svg'
-                } else {
-                    post.likes = post.likes.filter(
-                        (like) => like.userId !== userId,
-                    )
-                    likeImg.src = './assets/images/like-not-active.svg'
-                }
-                likesText.innerHTML = `Нравится: <strong>${post.likes.length}</strong>`
+                const prevCount = post.likes.length
+                post.isLiked = !post.isLiked
+                likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
+                const optimisticCount = prevCount + (post.isLiked ? 1 : -1)
+                likesText.innerHTML = `Нравится: <strong>${optimisticCount}</strong>`
 
                 await likePost({ token, postId })
 
@@ -120,11 +121,14 @@ function setupLikeHandlers({ posts, token, userId }) {
                     userId: post.user.id,
                 })
 
-                const updatedPost = response.find((p) => p.id === postId)
+                const updatedPost = response.find((p) => String(p.id) === String(postId))
                 if (updatedPost) {
                     post.likes = updatedPost.likes || []
                     post.isLiked = post.likes.some(
-                        (like) => like.userId === userId,
+                        (like) =>
+                            like?.userId === userId ||
+                            like?.id === userId ||
+                            like?.user?.id === userId,
                     )
 
                     likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
@@ -134,18 +138,10 @@ function setupLikeHandlers({ posts, token, userId }) {
                 console.error('Ошибка при обработке лайка:', error)
                 alert('Произошла ошибка при попытке поставить лайк')
 
-                post.isLiked = !post.isLiked
-                if (post.isLiked) {
-                    post.likes.push({ userId })
-                } else {
-                    post.likes = post.likes.filter(
-                        (like) => like.userId !== userId,
-                    )
-                }
-
+                // Откат отображения
                 const likeImg = likeButton.querySelector('img')
+                post.isLiked = !post.isLiked
                 likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
-
                 const likesText = likeButton.nextElementSibling
                 likesText.innerHTML = `Нравится: <strong>${post.likes.length}</strong>`
             }
