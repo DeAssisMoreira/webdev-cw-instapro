@@ -4,6 +4,7 @@ import { posts, goToPage } from '../index.js'
 import { formatDistanceToNow } from ' https://cdn.jsdelivr.net/npm/date-fns@3/+esm'
 import * as ruLocale from ' https://cdn.jsdelivr.net/npm/date-fns@3/locale/ru/+esm'
 import { likePost, dislikePost, getPosts } from '../api.js'
+import { escapeHtml } from '../helpers.js'
 
 export function renderPostsPageComponent({ appEl, user }) {
     const postsWithLikes = posts.map((post) => ({
@@ -29,7 +30,7 @@ export function renderPostsPageComponent({ appEl, user }) {
                   <li class="post">
                     <div class="post-header" data-user-id="${post.user.id}">
                         <img src="${post.user.imageUrl}" class="post-header__user-image">
-                        <p class="post-header__user-name">${post.user.name}</p>
+                        <p class="post-header__user-name">${escapeHtml(post.user.name)}</p>
                     </div>
                     <div class="post-image-container">
                       <img class="post-image" src="${post.imageUrl}">
@@ -43,8 +44,8 @@ export function renderPostsPageComponent({ appEl, user }) {
                       </p>
                     </div>
                     <p class="post-text">
-                      <span class="user-name">${post.user.name}</span>
-                      ${post.description}
+                      <span class="user-name">${escapeHtml(post.user.name)}</span>
+                      ${escapeHtml(post.description)}
                     </p>
                     <p class="post-date">
                     ${formatDistanceToNow(new Date(post.createdAt), {
@@ -93,7 +94,10 @@ function setupLikeHandlers({ posts, token, userId }) {
                 return
             }
 
-            const post = posts.find((post) => post.id === postId)
+            if (likeButton.dataset.loading === 'true') return
+            likeButton.dataset.loading = 'true'
+
+            const post = posts.find((post) => String(post.id) === String(postId))
             if (!post) return
 
             try {
@@ -108,7 +112,11 @@ function setupLikeHandlers({ posts, token, userId }) {
                 const optimisticCount = prevCount + (post.isLiked ? 1 : -1)
                 likesText.innerHTML = `Нравится: <strong>${optimisticCount}</strong>`
 
-                await likePost({ token, postId })
+                if (wasLiked) {
+                    await dislikePost({ token, postId })
+                } else {
+                    await likePost({ token, postId })
+                }
 
                 const response = await getPosts({ token })
 
@@ -129,12 +137,13 @@ function setupLikeHandlers({ posts, token, userId }) {
                 console.error('Ошибка при обработке лайка:', error)
                 alert('Произошла ошибка при попытке поставить лайк')
 
-                // Вернём предыдущее отображение
                 const likeImg = likeButton.querySelector('img')
                 post.isLiked = !post.isLiked
                 likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
                 const likesText = likeButton.nextElementSibling
                 likesText.innerHTML = `Нравится: <strong>${post.likes.length}</strong>`
+            } finally {
+                likeButton.dataset.loading = 'false'
             }
         })
     })
