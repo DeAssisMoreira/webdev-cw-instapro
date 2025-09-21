@@ -106,7 +106,7 @@ function setupLikeHandlers({ posts, token, userId }) {
 
                 const wasLiked = post.isLiked
                 const prevCount = post.likes.length
-
+                
                 post.isLiked = !post.isLiked
                 likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
                 const optimisticCount = prevCount + (post.isLiked ? 1 : -1)
@@ -118,29 +118,16 @@ function setupLikeHandlers({ posts, token, userId }) {
                     await likePost({ token, postId })
                 }
 
-                const response = await getPosts({ token })
-
-                const updatedPost = response.find((p) => String(p.id) === String(postId))
-                if (updatedPost) {
-                    post.likes = updatedPost.likes || []
-                    post.isLiked = post.likes.some(
-                        (like) =>
-                            like?.userId === userId ||
-                            like?.id === userId ||
-                            like?.user?.id === userId,
-                    )
-
-                    likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
-                    likesText.innerHTML = `Нравится: <strong>${post.likes.length}</strong>`
-                }
+                post.likes.length = optimisticCount
             } catch (error) {
                 console.error('Ошибка при обработке лайка:', error)
                 alert('Произошла ошибка при попытке поставить лайк')
 
                 const likeImg = likeButton.querySelector('img')
+                const likesText = likeButton.nextElementSibling
+                
                 post.isLiked = !post.isLiked
                 likeImg.src = `./assets/images/${post.isLiked ? 'like-active.svg' : 'like-not-active.svg'}`
-                const likesText = likeButton.nextElementSibling
                 likesText.innerHTML = `Нравится: <strong>${post.likes.length}</strong>`
             } finally {
                 likeButton.dataset.loading = 'false'
