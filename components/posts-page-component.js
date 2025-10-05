@@ -3,10 +3,16 @@ import { renderHeaderComponent } from './header-component.js'
 import { posts, goToPage } from '../index.js'
 import { formatDistanceToNow } from ' https://cdn.jsdelivr.net/npm/date-fns@3/+esm'
 import * as ruLocale from ' https://cdn.jsdelivr.net/npm/date-fns@3/locale/ru/+esm'
-import { likePost, dislikePost, getPosts } from '../api.js'
+import { likePost, dislikePost, getPosts, deletePost } from '../api.js'
 import { escapeHtml } from '../helpers.js'
 
 export function renderPostsPageComponent({ appEl, user }) {
+    const isCurrentUserPost = (post, currentUser) => {
+        if (!currentUser || !post) return false
+        const ownerId = post?.user?.id ?? post?.userId ?? post?.user?._id
+        const currentUserId = currentUser?.id ?? currentUser?._id ?? currentUser?.user?.id
+        return currentUserId != null && String(ownerId) === String(currentUserId)
+    }
     const postsWithLikes = posts.map((post) => ({
         ...post,
         likes: post.likes || [],
@@ -26,8 +32,11 @@ export function renderPostsPageComponent({ appEl, user }) {
                 <ul class="posts">
                 ${postsWithLikes
                     .map(
-                        (post) => `
-                  <li class="post">
+                        (post) => {
+                            const ownerId = post?.user?.id ?? post?.userId ?? post?.user?._id
+                            const isOwn = isCurrentUserPost(post, user)
+                            return `
+                  <li class="post" data-owner-id="${ownerId ?? ''}" data-is-own="${isOwn}">
                     <div class="post-header" data-user-id="${post.user.id}">
                         <img src="${post.user.imageUrl}" class="post-header__user-image">
                         <p class="post-header__user-name">${escapeHtml(post.user.name)}</p>
@@ -42,10 +51,13 @@ export function renderPostsPageComponent({ appEl, user }) {
                       <p class="post-likes-text">
                         Нравится: <strong>${post.likes.length}</strong>
                       </p>
+                      ${isCurrentUserPost(post, user) ? `
+                        <button class="delete-button" data-post-id="${post.id}">Удалить</button>
+                      ` : ''}
                     </div>
                     <p class="post-text">
                       <span class="user-name">${escapeHtml(post.user.name)}</span>
-                      ${escapeHtml(post.description)}
+                      ${post.description}
                     </p>
                     <p class="post-date">
                     ${formatDistanceToNow(new Date(post.createdAt), {
@@ -54,7 +66,8 @@ export function renderPostsPageComponent({ appEl, user }) {
                     })}
                     </p>
                   </li>
-                  `,
+                  `
+                        }
                     )
                     .join('')}
                 </ul>
@@ -62,10 +75,19 @@ export function renderPostsPageComponent({ appEl, user }) {
 
     appEl.innerHTML = appHtml
 
+    // Диагностика: покажем в консоли текущего пользователя и количество кнопок удаления
+    try {
+        const currentUserId = user?.id ?? user?._id ?? user?.user?.id
+        const deleteButtonsCount = document.querySelectorAll('.delete-button').length
+        console.log('[posts] currentUserId=', currentUserId, 'deleteButtons=', deleteButtonsCount)
+    } catch {}
+
     renderHeaderComponent({
         element: document.querySelector('.header-container'),
         user,
     })
+
+    setupDeleteHandlers({ user })
 
     setupLikeHandlers({
         posts: postsWithLikes,
@@ -77,6 +99,33 @@ export function renderPostsPageComponent({ appEl, user }) {
         userEl.addEventListener('click', () => {
             console.log('Clicked user:', userEl.dataset.userId)
             goToPage(USER_POSTS_PAGE, { userId: userEl.dataset.userId })
+        })
+    })
+}
+
+function setupDeleteHandlers({ user }) {
+    const deleteButtons = document.querySelectorAll('.delete-button')
+    deleteButtons.forEach((button) => {
+        button.addEventListener('click', async (event) => {
+            event.stopPropagation()
+            if (!user) {
+                alert('Для удаления необходимо авторизоваться')
+                return
+            }
+
+            const confirmed = window.confirm('Удалить пост?')
+            if (!confirmed) return
+
+            const postId = button.dataset.postId
+            try {
+                await deletePost({ token: `Bearer ${user.token}`, postId })
+                // Перезагрузим ленту
+                await getPosts({ token: `Bearer ${user.token}` })
+                location.reload()
+            } catch (error) {
+                console.error('Ошибка удаления поста:', error)
+                alert('Не удалось удалить пост')
+            }
         })
     })
 }
