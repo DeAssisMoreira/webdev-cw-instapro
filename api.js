@@ -107,7 +107,7 @@ export function getUserPosts({ token, userId }) {
         })
 }
 
-export function likePost({ token, postId }) {
+export function toggleLike({ token, postId }) {
     return fetch(`${postsHost}/${postId}/like`, {
         method: 'POST',
         headers: {
@@ -117,22 +117,19 @@ export function likePost({ token, postId }) {
         if (response.status === 401) {
             throw new Error('Нет авторизации')
         }
+        if (!response.ok) {
+            throw new Error('Ошибка при переключении лайка')
+        }
         return response.json()
     })
 }
 
+export function likePost({ token, postId }) {
+    return toggleLike({ token, postId })
+}
+
 export function dislikePost({ token, postId }) {
-    return fetch(`${postsHost}/${postId}/like`, {
-        method: 'DELETE',
-        headers: {
-            Authorization: token,
-        },
-    }).then((response) => {
-        if (response.status === 401) {
-            throw new Error('Нет авторизации')
-        }
-        return response.json()
-    })
+    return toggleLike({ token, postId })
 }
 
 export function deletePost({ token, postId }) {

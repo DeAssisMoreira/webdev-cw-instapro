@@ -51,10 +51,6 @@ export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
                             const isOwn = isCurrentUserPost(post, user)
                             return `
                     <li class="post" data-owner-id="${ownerId ?? ''}" data-is-own="${isOwn}">
-                        <div class="post-header" data-user-id="${post.user.id}">
-                            <img src="${post.user.imageUrl}" class="post-header__user-image">
-                            <p class="post-header__user-name">${escapeHtml(post.user.name)}</p>
-                        </div>
                         <div class="post-image-container">
                             <img class="post-image" src="${post.imageUrl}">
                         </div>
@@ -90,7 +86,6 @@ export function renderUserPostsPageComponent({ appEl, user, posts, page }) {
 
     appEl.innerHTML = appHtml
 
-    // Диагностика
     try {
         const currentUserId = user?.id ?? user?._id ?? user?.user?.id
         const deleteButtonsCount = document.querySelectorAll('.delete-button').length
@@ -151,7 +146,7 @@ function setupLikeHandlers({ posts, token, userId }) {
                 post.likes.length = optimisticCount
             } catch (error) {
                 console.error('Ошибка при обработке лайка:', error)
-                alert('Произошла ошибка при попытке поставить лайк')
+                alert(`Ошибка: ${error.message}`)
 
                 const likeImg = likeButton.querySelector('img')
                 const likesText = likeButton.nextElementSibling

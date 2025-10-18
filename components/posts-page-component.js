@@ -75,7 +75,6 @@ export function renderPostsPageComponent({ appEl, user }) {
 
     appEl.innerHTML = appHtml
 
-    // Диагностика: покажем в консоли текущего пользователя и количество кнопок удаления
     try {
         const currentUserId = user?.id ?? user?._id ?? user?.user?.id
         const deleteButtonsCount = document.querySelectorAll('.delete-button').length
@@ -170,7 +169,7 @@ function setupLikeHandlers({ posts, token, userId }) {
                 post.likes.length = optimisticCount
             } catch (error) {
                 console.error('Ошибка при обработке лайка:', error)
-                alert('Произошла ошибка при попытке поставить лайк')
+                alert(`Ошибка: ${error.message}`)
 
                 const likeImg = likeButton.querySelector('img')
                 const likesText = likeButton.nextElementSibling
