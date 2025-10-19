@@ -1,5 +1,6 @@
 import { goToPage, logout } from '../index.js'
 import { ADD_POSTS_PAGE, AUTH_PAGE, POSTS_PAGE } from '../routes.js'
+import { escapeHtml } from '../helpers.js'
 
 /**
  * Компонент заголовка страницы.
@@ -24,7 +25,7 @@ export function renderHeaderComponent({ element, user }) {
       </button>
       ${
           user
-              ? `<button title="${user.name}" class="header-button logout-button">Выйти</button>`
+              ? `<button title="${escapeHtml(user.name)}" class="header-button logout-button">Выйти</button>`
               : ''
       }  
   </div>
