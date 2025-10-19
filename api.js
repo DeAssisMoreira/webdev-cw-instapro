@@ -129,7 +129,20 @@ export function likePost({ token, postId }) {
 }
 
 export function dislikePost({ token, postId }) {
-    return toggleLike({ token, postId })
+    return fetch(`${postsHost}/${postId}/dislike`, {
+        method: 'POST',
+        headers: {
+            Authorization: token,
+        },
+    }).then((response) => {
+        if (response.status === 401) {
+            throw new Error('Нет авторизации')
+        }
+        if (!response.ok) {
+            throw new Error('Ошибка при удалении лайка')
+        }
+        return response.json()
+    })
 }
 
 export function deletePost({ token, postId }) {
